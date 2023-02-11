@@ -231,7 +231,8 @@ public class AddPlaceActivity extends FragmentActivity implements OnMapReadyCall
         String postal_code = addresses.get(0).getPostalCode();
         String country = addresses.get(0).getCountryName();
         // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-        FavPlaces favPlace = new FavPlaces(name, postal_code, country);
+        FavPlaces favPlace = new FavPlaces(name, postal_code, country, String.valueOf(latitude), String.valueOf(longitude));
+
         FavPlaceViewModel.setList(favPlace);
     }
 }
