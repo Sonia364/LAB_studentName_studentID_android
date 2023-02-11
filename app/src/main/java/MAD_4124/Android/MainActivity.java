@@ -1,5 +1,7 @@
 package MAD_4124.Android;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModel;
@@ -9,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,8 +22,12 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import MAD_4124.Android.adapter.RecyclerViewAdapter;
@@ -37,10 +44,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private RecyclerViewAdapter recyclerViewAdapter;
 
     private SwipeHelper swipeHelper;
-    private List<FavPlaces> placesList;
+    private static List<FavPlaces> placesList;
     private FavPlaces deletedPlace;
 
     private FavPlaceViewModel favPlaceViewModel;
+
+    // instance of shared preferences
+    static SharedPreferences sharedPreferences;
+
+    public static final String SHARED_PREFERENCES_NAME = "username";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         }
 
         setContentView(binding.getRoot());
+
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -89,14 +103,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     @Override
     protected void onResume() {
         super.onResume();
+        setSharedPreference();
         recyclerViewAdapter = new RecyclerViewAdapter(placesList, this, this);
         recyclerView.setAdapter(recyclerViewAdapter);
-    }
-
-    private void updateUI() {
-        recyclerView.setAdapter(recyclerViewAdapter);
-        recyclerViewAdapter.notifyDataSetChanged();
-        Toast.makeText(this, "Employees Menu Selected", Toast.LENGTH_SHORT).show();
+        getSharedPreference();
     }
 
     private void deletePlace(int position) {
@@ -116,7 +126,28 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         alertDialog.show();
     }
 
+    private static void setSharedPreference(){
+        // instantiate shared preferences
+        Gson gson = new Gson();
+        String json = gson.toJson(placesList);
+        sharedPreferences.edit().putString("favPlaces", json).commit();
+        Log.i(TAG, "onresume: " + placesList);
+    }
 
+    private static List<FavPlaces> getSharedPreference(){
+        // instantiate shared preferences
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("favPlaces", "");
+        Type type = new TypeToken<List<FavPlaces>>(){}.getType();
+        FavPlaces favPlaces;
+        List<FavPlaces> newPlaceList = gson.fromJson(json, type);
+       //Log.i(TAG, "onresume: " + newPlaceList);
+        return newPlaceList;
+    }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        setSharedPreference();
+    }
 }

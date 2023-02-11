@@ -9,6 +9,7 @@ public class FavPlaceViewModel extends ViewModel {
 
     static private List<FavPlaces> allPlacesList = new ArrayList<>();
     static public List<FavPlaces> getList() {
+
         return allPlacesList;
     }
 
