@@ -44,10 +44,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private RecyclerViewAdapter recyclerViewAdapter;
 
     private SwipeHelper swipeHelper;
-    private static List<FavPlaces> placesList;
+    private List<FavPlaces> placesList;
     private FavPlaces deletedPlace;
-
-    private FavPlaceViewModel favPlaceViewModel;
 
     // instance of shared preferences
     static SharedPreferences sharedPreferences;
@@ -68,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        placesList = favPlaceViewModel.getList();
+        placesList = FavPlaceViewModel.getList();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
@@ -103,10 +101,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     @Override
     protected void onResume() {
         super.onResume();
-        setSharedPreference();
         recyclerViewAdapter = new RecyclerViewAdapter(placesList, this, this);
         recyclerView.setAdapter(recyclerViewAdapter);
-        getSharedPreference();
     }
 
     private void deletePlace(int position) {
@@ -126,15 +122,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         alertDialog.show();
     }
 
-    private static void setSharedPreference(){
+    private void setSharedPreference(){
         // instantiate shared preferences
         Gson gson = new Gson();
         String json = gson.toJson(placesList);
         sharedPreferences.edit().putString("favPlaces", json).commit();
-        Log.i(TAG, "onresume: " + placesList);
+        //Log.i(TAG, "onresume: " + json);
     }
 
-    private static List<FavPlaces> getSharedPreference(){
+    private List<FavPlaces> getSharedPreference(){
         // instantiate shared preferences
         Gson gson = new Gson();
         String json = sharedPreferences.getString("favPlaces", "");
@@ -145,9 +141,4 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         return newPlaceList;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        setSharedPreference();
-    }
 }
