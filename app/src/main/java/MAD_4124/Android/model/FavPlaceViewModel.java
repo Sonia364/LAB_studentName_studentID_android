@@ -15,4 +15,8 @@ public class FavPlaceViewModel extends ViewModel {
     static public void setList(FavPlaces list) {
         allPlacesList.add(list);
     }
+
+    static public void deleteList(int position) {
+        allPlacesList.remove(position);
+    }
 }
