@@ -42,7 +42,9 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecyclerViewAda
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         T t = tList.get(position);
         FavPlaces e = (FavPlaces) t;
-        Log.d(TAG, "onBindViewHolder: none");
+        holder.name.setText(e.getName());
+        holder.postal_code.setText(e.getPostal_code());
+        holder.country.setText(e.getCountry());
     }
 
     @Override
