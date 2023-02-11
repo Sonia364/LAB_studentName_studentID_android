@@ -54,8 +54,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        FavPlaces fav = new FavPlaces("Fairview", "CF6784", "Canada");
-        favPlaceViewModel.getList().add(fav);
         placesList = favPlaceViewModel.getList();
 
         FloatingActionButton fab = findViewById(R.id.fab);

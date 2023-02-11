@@ -1,6 +1,7 @@
 package MAD_4124.Android;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -10,6 +11,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,14 +30,19 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import MAD_4124.Android.databinding.ActivityMainBinding;
 import MAD_4124.Android.databinding.AddPlaceActivityBinding;
+import MAD_4124.Android.model.FavPlaceViewModel;
+import MAD_4124.Android.model.FavPlaces;
 
 public class AddPlaceActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -127,6 +134,32 @@ public class AddPlaceActivity extends FragmentActivity implements OnMapReadyCall
 
         });
 
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(AddPlaceActivity.this);
+                builder.setTitle("Do you want to add this to Favourite place list ?");
+                builder.setPositiveButton("Yes", (dialog, which) -> {
+                    Double markerLong = marker.getPosition().longitude;
+                    Double markerLat= marker.getPosition().latitude;
+                    try {
+                        favPlaceData(markerLat, markerLong);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Toast.makeText(AddPlaceActivity.this,  " added ", Toast.LENGTH_SHORT).show();
+                    onBackPressed();
+                });
+                builder.setNegativeButton("no", (dialog, which) -> {
+
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
+            }
+        });
+
     }
 
 
@@ -179,5 +212,26 @@ public class AddPlaceActivity extends FragmentActivity implements OnMapReadyCall
         String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
 
         return address;
+    }
+
+    public void favPlaceData(Double latitude,  Double longitude) throws IOException {
+        Geocoder geocoder;
+        List<Address> addresses;
+        geocoder = new Geocoder(this, Locale.getDefault());
+
+        addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+
+        String name = addresses.get(0).getLocality();
+        Date currentTime = Calendar.getInstance().getTime();
+
+        if(name.equals("")){
+            name = String.valueOf(currentTime);
+        }
+
+        String postal_code = addresses.get(0).getPostalCode();
+        String country = addresses.get(0).getCountryName();
+        // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+        FavPlaces favPlace = new FavPlaces(name, postal_code, country);
+        FavPlaceViewModel.setList(favPlace);
     }
 }
