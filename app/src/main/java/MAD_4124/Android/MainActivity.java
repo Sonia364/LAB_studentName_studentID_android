@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                         Color.parseColor("#ff3c30"),
                         SwipeDirection.LEFT,
                         position -> {
-                            //deletePlace(position);
+                            deletePlace(position);
                         }));
             }
         };
